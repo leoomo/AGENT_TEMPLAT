@@ -1,0 +1,40 @@
+{
+  "project": "项目名称",
+  "description": "项目描述 - 简要说明项目目标和范围",
+  "tasks": [
+    {
+      "id": 1,
+      "title": "示例任务 - 请替换为实际任务",
+      "description": "任务描述 - 要达成什么目标",
+      "priority": 1,
+      "depends_on": [],
+      "steps": [
+        "步骤1 - 同时也是验收标准1",
+        "步骤2 - 同时也是验收标准2",
+        "步骤3 - 同时也是验收标准3"
+      ],
+      "acceptance_criteria": [
+        "command: npm test",
+        "file: src/index.ts"
+      ],
+      "passes": false,
+      "blocked": false,
+      "blocked_reason": null
+    },
+    {
+      "id": 2,
+      "title": "依赖前一个任务的任务",
+      "description": "这个任务需要任务1完成后才能开始",
+      "priority": 2,
+      "depends_on": [1],
+      "steps": [
+        "步骤1",
+        "步骤2"
+      ],
+      "acceptance_criteria": [
+        "command: npm run build"
+      ],
+      "passes": false
+    }
+  ]
+}
