@@ -7,33 +7,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 此项目用于 **研究和探索 Agent 自动化执行的最佳提示词工程**。核心目标：
 
 - 探索如何通过提示词设计让 AI Agent 可靠地完成复杂软件开发任务
-- 对比不同提示词策略的效果（v1 详细版 vs v2 精简版）
+- 对比不同提示词策略的效果（v1/v2/v3 三个版本）
 - 研究如何在有限的 Context Window 中最大化指令效率
 - 建立可复用的 Agent 工作流模板
 
 ## 项目性质
 
-这是一个 **Agent 工作流模板仓库**，包含两套可复用的 AI Agent 指令模板，用于指导 Agent 完成软件开发任务。模板本身不是可执行代码，而是被复制到其他项目中使用的配置文件。
+这是一个 **Agent 工作流模板仓库**，包含三套可复用的 AI Agent 指令模板，用于指导 Agent 完成软件开发任务。模板本身不是可执行代码，而是被复制到其他项目中使用的配置文件。
 
 ## 版本对比与实验
 
-| 维度 | v1 (原始版) | v2 (精简版) |
-|------|------------|------------|
-| Token 占用 | ~8000+ | ~600 |
-| 配置方式 | 模板变量手动替换 | 脚本自动检测 |
-| Context 预留 | 较少 | 最大化 |
-| 适用场景 | 精细控制需求 | 大型项目、复杂任务 |
+| 维度 | v1 (原始版) | v2 (精简版) | v3 (原生集成版) |
+|------|------------|------------|----------------|
+| Token 占用 | ~8000+ | ~600 | ~200 |
+| 配置方式 | 模板变量手动替换 | 脚本自动检测 | Skills/Hooks 原生 |
+| 执行方式 | 手动执行脚本 | 手动执行脚本 | `/init`, `/task` 等命令 |
+| 自动格式化 | 无 | 无 | PostToolUse Hook |
+| Context 预留 | 较少 | 最大化 | 最大化 |
+| 适用场景 | 精细控制需求 | 大型项目、复杂任务 | Claude Code 深度集成 |
 
-**实验假设**: v2 通过将详细逻辑外部化到脚本，可以在保持工作流完整性的同时，为项目代码上下文预留更多 Context 空间。
+**实验假设**: v3 通过原生 Skills 和 Hooks，在保持 v2 精简优势的同时，提供更流畅的交互体验。
 
 ## 版本结构
 
 ```
 v1/  # 原始版 - 模板变量方式 (~8000 tokens)
 v2/  # 精简版 - 脚本驱动方式 (~600 tokens)
+v3/  # 原生版 - Skills/Hooks 集成 (~200 tokens)
 ```
 
-## v2 脚本测试
+## v3 使用方式
+
+v3 通过 Claude Code 原生功能实现工作流：
+
+```bash
+# 复制 v3 到项目
+cp -r v3/. /path/to/project/
+
+# 在项目中启动 Claude Code
+claude
+
+# 使用 Skills 命令
+/init   # 初始化项目（自动检测类型）
+/task   # 选择下一个任务
+/verify # 验证实现
+/commit # 原子提交
+```
+
+### v3 核心组件
+
+| 组件 | 文件 | 功能 |
+|------|------|------|
+| 核心指令 | AGENT_TEMPLATE.md | 工作流规则 (~50行) |
+| /init | .claude/commands/init.md | 项目初始化 |
+| /task | .claude/commands/task.md | 任务选择 |
+| /verify | .claude/commands/verify.md | 实现验证 |
+| /commit | .claude/commands/commit.md | 原子提交 |
+| Hooks | .claude/settings.json | 自动格式化、通知 |
+
+## v2/v3 脚本测试
 
 修改 v2/scripts/ 后，测试脚本：
 
@@ -46,7 +78,7 @@ python3 scripts/task-analyzer.py  # 测试任务分析
 
 ## JSON Schema 验证
 
-修改 v2/schemas/task.schema.json 后，验证模板：
+修改 v2/schemas/task.schema.json 或 v3/schemas/task.schema.json 后，验证模板：
 
 ```bash
 python3 -c "
